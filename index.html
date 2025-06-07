@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TheBestLevel - שיעורי מיינקראפט אונליין</title>
+<style>
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: Arial, sans-serif;
+    color: #fff;
+    direction: rtl;
+    overflow-x: hidden;
+  }
+  body {
+    background: url('minecraft-bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+    position: relative;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    top:0; left:0; right:0; bottom:0;
+    background-color: rgba(10,24,47,0.7);
+    z-index: -1;
+  }
+  header {
+    position: fixed;
+    top: 0; right: 0; left: 0;
+    background: rgba(10, 39, 64, 0.9);
+    padding: 15px;
+    text-align: center;
+    z-index: 10;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 2.2rem;
+    color: #ffd700;
+    text-shadow: 0 0 5px #ffd700;
+  }
+  header p {
+    margin: 5px 0 0;
+    color: #eee;
+    font-weight: 600;
+  }
+  nav {
+    margin-top: 5px;
+  }
+  nav a {
+    color: #ffd700;
+    margin: 0 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+  }
+  nav a:hover {
+    color: #fff;
+  }
+  main {
+    max-width: 800px;
+    margin: 140px auto 40px;
+    background: rgba(10,24,47,0.85);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.7);
+  }
+  h2 {
+    color: #ffd700;
+    border-bottom: 2px solid #ffd700;
+    padding-bottom: 8px;
+    display: inline-block;
+    background: rgba(10,24,47,0.85);
+    text-shadow: 2px 2px 4px #000;
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
+  ul {
+    padding-right: 15px;
+  }
+  ul li {
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    position: relative;
+    padding-right: 25px;
+  }
+  ul li::before {
+    content: "✔";
+    position: absolute;
+    right: 0;
+    color: #ffd700;
+  }
+  p {
+    font-size: 1.1rem;
+    margin: 12px 0;
+  }
+  .highlight {
+    font-weight: 700;
+    color: #ffd700;
+  }
+  form {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+  }
+  label {
+    margin: 12px 0 6px;
+  }
+  input {
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+  }
+  button {
+    margin-top: 20px;
+    padding: 14px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    background: #ffd700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #0a2740;
+    transition: background 0.3s ease;
+  }
+  button:hover {
+    background: #e6c200;
+  }
+  footer {
+    text-align: center;
+    padding: 20px 10px;
+    color: #ffd700aa;
+    background: #0a2740cc;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>TheBestLevel - שיעורי מיינקראפט אונליין</h1>
+  <p>ללמוד לבנות ולשחק מהנוחות של הבית שלך</p>
+  <nav>
+    <a href="index.html">דף הבית</a>
+    <a href="faq.html">שאלות נפוצות</a>
+  </nav>
+</header>
+
+<main>
+  <section>
+    <h2>מה לומדים בקורס?</h2>
+    <ul>
+      <li>שליטה במשחק ובפונקציות מתקדמות</li>
+      <li>בניית מבנים יצירתיים ומרשימים</li>
+      <li>הישרדות חכמה ואסטרטגיות</li>
+      <li>פקודות, טריקים וטכניקות מיוחדות</li>
+      <li>משחק עם חברים ולמידה קבוצתית</li>
+    </ul>
+  </section>
+
+  <section style="margin-top: 40px;">
+    <p><span class="highlight">משך כל שיעור:</span> שעה אחת</p>
+    <p><span class="highlight">מיקום:</span> אונליין, בזום</p>
+  </section>
+
+  <section style="margin-top: 40px;">
+    <h2>רוצה להצטרף? מלא את הפרטים</h2>
+    <form id="signup-form">
+      <label for="name">שם מלא</label>
+      <input type="text" id="name" name="name" placeholder="הכנס שם" required />
+
+      <label for="email">אימייל</label>
+      <input type="email" id="email" name="email" placeholder="הכנס אימייל" required />
+
+      <label for="phone">טלפון</label>
+      <input type="tel" id="phone" name="phone" placeholder="הכנס מספר טלפון" required />
+
+      <button type="submit">שלח הרשמה</button>
+    </form>
+  </section>
+</main>
+
+<footer>
+  &copy; 2025 TheBestLevel. כל הזכויות שמורות.
+</footer>
+
+<script>
+  document.getElementById('signup-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    alert('תודה שהרשמת! ניצור קשר בהקדם.');
+  });
+</script>
+</body>
+</html>
