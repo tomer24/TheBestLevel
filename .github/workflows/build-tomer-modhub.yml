@@ -1,0 +1,43 @@
+name: Build Tomer Mod Hub Fabric JAR
+on:
+  push:
+    branches: [chatgpt/tomer-modhub-fabric-build]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.1.0'
+      - name: Reconstruct isolated original source project
+        shell: bash
+        run: |
+          mkdir -p /tmp/tomer-modhub
+          cat modhub-build/payload{1,2,3,4}.b64 | base64 --decode | tar -xz -C /tmp/tomer-modhub
+          test -f /tmp/tomer-modhub/src/main/java/dev/tomer/modhub/TomerModHub.java
+          test -f /tmp/tomer-modhub/src/main/resources/fabric.mod.json
+      - name: Build with real Minecraft and Fabric dependencies
+        working-directory: /tmp/tomer-modhub
+        run: gradle --no-daemon clean build --stacktrace
+      - name: Copy validated production jar
+        shell: bash
+        run: |
+          find /tmp/tomer-modhub/build/libs -maxdepth 1 -name '*.jar' -print
+          JAR=$(find /tmp/tomer-modhub/build/libs -maxdepth 1 -name '*.jar' ! -name '*sources*' ! -name '*dev*' | head -1)
+          test -n "$JAR"
+          unzip -l "$JAR" | grep 'fabric.mod.json'
+          unzip -l "$JAR" | grep 'dev/tomer/modhub/TomerModHub.class'
+          cp "$JAR" /tmp/hub.jar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hub-jar
+          path: /tmp/hub.jar
+          if-no-files-found: error
