@@ -1,0 +1,13 @@
+plugins { id 'fabric-loom' version '1.12-SNAPSHOT' }
+group='dev.tomer'
+version='1.5.0'
+base { archivesName='TomerGlowRenderer' }
+repositories { mavenCentral(); maven { url='https://maven.fabricmc.net/' } }
+dependencies {
+    minecraft 'com.mojang:minecraft:1.21.10'
+    mappings loom.officialMojangMappings()
+    modImplementation 'net.fabricmc:fabric-loader:0.17.3'
+    modImplementation 'net.fabricmc.fabric-api:fabric-api:0.138.4+1.21.10'
+}
+tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8'; options.release=21 }
+java { sourceCompatibility=JavaVersion.VERSION_21; targetCompatibility=JavaVersion.VERSION_21 }
