@@ -3,7 +3,7 @@ on:
   push:
     branches: [chatgpt/tomer-modhub-fabric-build]
     paths:
-      - 'modhub-build/TRIGGER.txt'
+      - 'modhub-build/TRIGGER-15.txt'
   workflow_dispatch:
 permissions:
   contents: read
@@ -19,7 +19,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.1.0'
-      - name: Reconstruct and upgrade Fabric mod
+      - name: Restore original 1.4 and apply 1.5 persistent ESP sources
         shell: bash
         run: |
           set -euo pipefail
@@ -27,31 +27,46 @@ jobs:
           cat modhub-build/payload{1,2,3,4}.b64 | base64 --decode | tar -xz -C /tmp/tomer-modhub
           SRC=/tmp/tomer-modhub/src/main/java/dev/tomer/modhub
           for FILE in TomerModHub.java ChestEspOverlay.java BuiltInNavigator.java ModHubScreen.java; do
-            test -s "modhub-build/overrides/$FILE"
             cp "modhub-build/overrides/$FILE" "$SRC/$FILE"
           done
           cat modhub-build/v14-patch-part{0,1,2}.b64 | base64 --decode > /tmp/v14-core.tar.xz
           echo 'f78fb6e8a5e499b7f5350381d809630b3ca8d45e63a64b8c150eb60a0fe110ac  /tmp/v14-core.tar.xz' | sha256sum -c -
           tar -xJf /tmp/v14-core.tar.xz -C "$SRC"
-          sed -i 's/mod_version=1.2.0/mod_version=1.4.0/' /tmp/tomer-modhub/gradle.properties
-          sed -i 's/Baritone coordinate navigator, and chest ESP./self-contained walking and colored ESP for chests, ender chests, shulkers, and torches./' /tmp/tomer-modhub/src/main/resources/fabric.mod.json
-          test -f /tmp/tomer-modhub/src/main/resources/fabric.mod.json
-      - name: Build with real Minecraft and Fabric
+          for FILE in TomerModHub.java ChestEspOverlay.java ModHubScreen.java GlowBridge.java; do
+            cp "modhub-build/v15/src/main/java/dev/tomer/modhub/$FILE" "$SRC/$FILE"
+          done
+          sed -i 's/mod_version=1.2.0/mod_version=1.5.0/' /tmp/tomer-modhub/gradle.properties
+          sed -i 's/Baritone coordinate navigator, and chest ESP./persistent discovered chest ESP with glowing blocks through terrain./' /tmp/tomer-modhub/src/main/resources/fabric.mod.json
+          mkdir -p /tmp/tomer-glow/src/main/java/dev/tomer/modhub
+          cp modhub-build/v15/glow/build.gradle /tmp/tomer-glow/
+          cp modhub-build/v15/glow/settings.gradle /tmp/tomer-glow/
+          cp modhub-build/v15/src/main/java/dev/tomer/modhub/GlowBridge.java /tmp/tomer-glow/src/main/java/dev/tomer/modhub/GlowBridge.java
+          cp modhub-build/v15/glow/src/main/java/dev/tomer/modhub/WorldGlowRenderer.java /tmp/tomer-glow/src/main/java/dev/tomer/modhub/WorldGlowRenderer.java
+      - name: Compile main Fabric mod in intermediary mappings
         working-directory: /tmp/tomer-modhub
         run: gradle --no-daemon clean build --stacktrace
-      - name: Validate and copy jar
+      - name: Compile 3D glow renderer in Mojang mappings
+        working-directory: /tmp/tomer-glow
+        run: gradle --no-daemon clean build --stacktrace
+      - name: Merge remapped renderer into production JAR and validate
         shell: bash
         run: |
           set -euo pipefail
           JAR=$(find /tmp/tomer-modhub/build/libs -maxdepth 1 -name '*.jar' ! -name '*sources*' ! -name '*dev*' | head -1)
-          test -n "$JAR"
-          unzip -l "$JAR" | grep -q 'fabric.mod.json'
-          unzip -l "$JAR" | grep -q 'dev/tomer/modhub/TomerModHub.class'
-          unzip -l "$JAR" | grep -q 'dev/tomer/modhub/BuiltInNavigator.class'
-          unzip -l "$JAR" | grep -q 'dev/tomer/modhub/ChestEspOverlay.class'
-          cp "$JAR" /tmp/hub.jar
+          RENDERER=$(find /tmp/tomer-glow/build/libs -maxdepth 1 -name '*.jar' ! -name '*sources*' ! -name '*dev*' | head -1)
+          test -s "$JAR"
+          test -s "$RENDERER"
+          mkdir -p /tmp/tomer-merged
+          (cd /tmp/tomer-merged && unzip -q "$RENDERER" 'dev/tomer/modhub/WorldGlowRenderer*.class')
+          cp "$JAR" /tmp/hub-v1.5.jar
+          (cd /tmp/tomer-merged && jar uf /tmp/hub-v1.5.jar dev/tomer/modhub/WorldGlowRenderer.class)
+          unzip -l /tmp/hub-v1.5.jar | grep -q 'dev/tomer/modhub/GlowBridge.class'
+          unzip -l /tmp/hub-v1.5.jar | grep -q 'dev/tomer/modhub/WorldGlowRenderer.class'
+          unzip -l /tmp/hub-v1.5.jar | grep -q 'dev/tomer/modhub/ChestEspOverlay.class'
+          unzip -p /tmp/hub-v1.5.jar fabric.mod.json | grep -q '1.5.0'
+          ls -lh /tmp/hub-v1.5.jar
       - uses: actions/upload-artifact@v4
         with:
-          name: hub-v1.4-jar
-          path: /tmp/hub.jar
+          name: hub-v1.5-jar
+          path: /tmp/hub-v1.5.jar
           if-no-files-found: error
