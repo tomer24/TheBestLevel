@@ -1,1 +1,1 @@
-Build Tomer Mod Hub v1.3.0 with integrated safe walking and Chest / Ender / Shulker / Torch ESP.
+Compile Tomer Mod Hub v1.4.0 with A* local pathfinding, swimming, and loaded-world block ESP.
