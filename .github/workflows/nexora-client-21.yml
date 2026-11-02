@@ -28,6 +28,7 @@ jobs:
           test -s /tmp/nexora21/src/main/java/net/nexora/client/ModHubScreen.java
           grep -q '^mod_version=2.1.0' /tmp/nexora21/gradle.properties
           sed -i 's/private static double heuristic(int x,int z,int gx,int gz)/private static double heuristic(double x,double z,double gx,double gz)/' /tmp/nexora21/src/main/java/net/nexora/client/BuiltInNavigator.java
+          sed -i -e 's/import net.minecraft.client.ParticleStatus;/import net.minecraft.server.level.ParticleStatus;/' -e 's/getWindow().getWindow()/getWindow().handle()/' -e 's/isInWaterOrBubble()/isInWater()/' /tmp/nexora21/glow/src/main/java/net/nexora/client/NexoraFeatures.java
       - name: Compile Fabric NEXORA core
         working-directory: /tmp/nexora21
         run: gradle --no-daemon clean build --stacktrace
