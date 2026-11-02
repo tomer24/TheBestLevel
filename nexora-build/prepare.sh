@@ -53,6 +53,11 @@ s=nav.read_text()
 s=s.replace('heuristic(x,z,goalX+.5,goalZ+.5)','Math.hypot(x-(goalX+.5),z-(goalZ+.5))')
 s=s.replace('heuristic(x,z,next.x()+.5,next.z()+.5)','Math.hypot(x-(next.x()+.5),z-(next.z()+.5))')
 nav.write_text(s)
+s=features.read_text()
+s=s.replace('import net.minecraft.client.ParticleStatus;', 'import net.minecraft.server.level.ParticleStatus;')
+s=s.replace('mc.getWindow().getWindow()', 'mc.getWindow().handle()')
+s=s.replace('mc.player.isInWaterOrBubble()', 'mc.player.isInWater()')
+features.write_text(s)
 PY
 
 test -f "$TARGET/src/main/java/net/nexora/client/NexoraClient.java"
