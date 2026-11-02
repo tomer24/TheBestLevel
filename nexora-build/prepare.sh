@@ -48,6 +48,11 @@ s=s.replace('point.x-r,point.y-r,point.z-r,','(float)(point.x-r),(float)(point.y
 s=s.replace('point.x+r,point.y+r,point.z+r,','(float)(point.x+r),(float)(point.y+r),(float)(point.z+r),')
 s=s.replace('bb.minX-pad,bb.minY-pad,bb.minZ-pad,bb.maxX+pad,bb.maxY+pad,bb.maxZ+pad,','(float)(bb.minX-pad),(float)(bb.minY-pad),(float)(bb.minZ-pad),\n            (float)(bb.maxX+pad),(float)(bb.maxY+pad),(float)(bb.maxZ+pad),')
 world.write_text(s)
+nav = root/'src/main/java/net/nexora/client/BuiltInNavigator.java'
+s=nav.read_text()
+s=s.replace('heuristic(x,z,goalX+.5,goalZ+.5)','Math.hypot(x-(goalX+.5),z-(goalZ+.5))')
+s=s.replace('heuristic(x,z,next.x()+.5,next.z()+.5)','Math.hypot(x-(next.x()+.5),z-(next.z()+.5))')
+nav.write_text(s)
 PY
 
 test -f "$TARGET/src/main/java/net/nexora/client/NexoraClient.java"
